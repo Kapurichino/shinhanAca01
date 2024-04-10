@@ -9,6 +9,47 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Management {
+    public static void modifyMemberInfo(Member member) {
+        System.out.println("--------------------------------------------------------");
+        System.out.print("수정할 회원 아이디: ");
+        String id = Ojdbc.sc.nextLine();
+        System.out.print("수정할 회원 패스워드: ");
+        String pwd = Ojdbc.sc.nextLine();
+        System.out.print("수정할 회원 이름: ");
+        String name = Ojdbc.sc.nextLine();
+        System.out.print("수정할 회원 전화번호: ");
+        String tel = Ojdbc.sc.nextLine();
+
+        try {
+            String sql = new StringBuilder()
+                    .append("UPDATE member SET ")
+                    .append("id =?, ")
+                    .append("pwd =?, ")
+                    .append("name =?, ")
+                    .append("tel =? ")
+                    .append("WHERE id =?")
+                    .toString();
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+            Ojdbc.pstmt.setString(1, id);
+            Ojdbc.pstmt.setString(2, pwd);
+            Ojdbc.pstmt.setString(3, name);
+            Ojdbc.pstmt.setString(4, tel);
+            Ojdbc.pstmt.setString(5, member.getId());
+
+            Ojdbc.pstmt.executeUpdate();
+
+            member.setId(id);
+            member.setPwd(pwd);
+            member.setName(name);
+            member.setTel(tel);
+
+            System.out.println("정보가 정상적으로 변경되었습니다.");
+            Ojdbc.pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public static void signUp() throws Exception{
         Member member = new Member();
