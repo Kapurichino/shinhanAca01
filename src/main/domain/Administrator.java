@@ -12,34 +12,6 @@ public class Administrator extends Member {
 	}
 
 	public void modifyProduct() {
-//		long productId = Long.parseLong(Ojdbc.sc.nextLine());
-//		System.out.print("수정할 상품 이름: ");
-//		String productName = Ojdbc.sc.nextLine();
-//		System.out.print("수정할 상품 가격: ");
-//		long productPrice = Long.parseLong(Ojdbc.sc.nextLine());
-//		System.out.print("수정할 상품 할인율: ");
-//		long productDiscountRate = Long.parseLong(Ojdbc.sc.nextLine());
-//		try {
-//			String sql = new StringBuilder()
-//					.append("UPDATE product SET ")
-//					.append("product_name =?, ")
-//					.append("price =?, ")
-//					.append("discount_rate =? ")
-//					.append("WHERE product_id = ? ")
-//					.toString();
-//			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
-//			Ojdbc.pstmt.setString(1,productName);
-//			Ojdbc.pstmt.setLong(2, productPrice);
-//			Ojdbc.pstmt.setLong(3, productDiscountRate);
-//			Ojdbc.pstmt.setLong(4, productId);
-//
-//			Ojdbc.pstmt.executeUpdate();
-//
-//			System.out.println("정보가 정상적으로 변경되었습니다.");
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
 		while(true) {
 			System.out.println("--------------------------------------------------------");
 			Controller.findAllProduct();

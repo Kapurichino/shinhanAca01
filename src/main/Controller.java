@@ -199,18 +199,70 @@ public class Controller {
                 Product product = new Product(
                         rs.getLong("product_id"),
                         rs.getString("product_name"),
-                        rs.getLong("price"),
-                        rs.getLong("discount_rate")
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
                 );
 
                 System.out.printf("%-9d %-10s %-10d %-10d %-8d\n"
                         ,product.getProduct_id()
                         ,product.getProduct_name()
                         ,product.getPrice()
-                        ,product.getPrice()
                         ,product.getDiscount_rate()
                         ,product.getPrice() * (100-product.getDiscount_rate()) / 100
                 );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void findAllProduct(Customer customer) {
+        try {
+            String sql = "" +
+                    "SELECT * FROM product ORDER BY product_id DESC ";
+
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+
+            ResultSet rs = Ojdbc.pstmt.executeQuery();
+            if("student".equals(customer.getMember_type())){
+                System.out.printf("%-6s %-10s %-8s %-8s %-8s\n"
+                        ,"상품 번호"
+                        ,"상품 이름"
+                        ,"상품 가격"
+                        ,"할인율"
+                        ,"할인적용가격");
+            } else {
+                System.out.printf("%-6s %-10s %-8s\n"
+                        ,"상품 번호"
+                        ,"상품 이름"
+                        ,"상품 가격");
+            }
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getLong("product_id"),
+                        rs.getString("product_name"),
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
+                );
+
+                if("student".equals(customer.getMember_type())){
+                    System.out.printf("%-9d %-10s %-10d %-10d %-8d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                            ,product.getDiscount_rate()
+                            ,product.getPrice() * (100-product.getDiscount_rate()) / 100
+                    );
+                } else {
+                    System.out.printf("%-9d %-10s %-10d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                    );
+                }
+
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -231,9 +283,10 @@ public class Controller {
                 product = new Product(
                         rs.getLong("product_id"),
                         rs.getString("product_name"),
-                        rs.getLong("price"),
-                        rs.getLong("discount_rate")
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
                 );
+
                 System.out.printf("%-6d %-12s %-6d %-6d %-6d\n"
                         ,product.getProduct_id()
                         ,product.getProduct_name()
@@ -241,6 +294,49 @@ public class Controller {
                         ,product.getDiscount_rate()
                         ,product.getPrice() * (100-product.getDiscount_rate()) / 100
                 );
+            }
+            Ojdbc.pstmt.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return product;
+    }
+
+    public static Product findProduct(Long product_id, Customer customer){
+        Product product = null;
+        try {
+            String sql = "" +
+                    "SELECT * FROM product "+
+                    "WHERE product_id=? ";
+
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+            Ojdbc.pstmt.setLong(1,product_id);
+            ResultSet rs = Ojdbc.pstmt.executeQuery();
+            while (rs.next()) {
+                product = new Product(
+                        rs.getLong("product_id"),
+                        rs.getString("product_name"),
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
+                );
+
+                if("student".equals(customer.getMember_type())){
+                    System.out.printf("%-6d %-12s %-6d %-6d %-6d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                            ,product.getDiscount_rate()
+                            ,product.getPrice() * (100-product.getDiscount_rate()) / 100
+                    );
+                } else {
+                    System.out.printf("%-6d %-12s %-6d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                    );
+                }
+
+
             }
             Ojdbc.pstmt.close();
         } catch (SQLException e) {
