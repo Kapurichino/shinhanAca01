@@ -14,10 +14,10 @@ public class Customer extends Member{
 		Map<Product, Integer> map = new HashMap<>();
 
 		while (flag){
-			Controller.findAllProduct();
+			Controller.findAllProduct(this);
 			System.out.print("몇 번 상품을 구매하시겠습니까?: ");
 			long productNo = Long.parseLong(Ojdbc.sc.nextLine());
-			Product product = Controller.findProduct(productNo);
+			Product product = Controller.findProduct(productNo, this);
 			System.out.print("몇 개를 구매하시겠습니까?: ");
 			int quantity = Integer.parseInt(Ojdbc.sc.nextLine());
 
