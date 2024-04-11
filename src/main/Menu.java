@@ -89,6 +89,15 @@ public class Menu {
                 case "1":
                     customer.order();
                     break;
+                case "2":
+                    customer.checkHistory(customer);
+                    break;
+                case "3":
+                    customer.authorizeStudent(customer);
+                    break;
+                case "4":
+                    Management.modifyMemberInfo(customer);
+                    break;
                 case "5":
                     System.out.println("로그아웃 되었습니다");
                     flag = false;
