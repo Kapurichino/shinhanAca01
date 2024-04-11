@@ -1,8 +1,7 @@
 package main.domain;
 
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import main.Management;
+import main.Controller;
 import main.Ojdbc;
 
 import java.sql.SQLException;
@@ -13,7 +12,7 @@ public class Administrator extends Member {
 	}
 
 	public void modifyProduct() {
-		Management.findAllProduct();
+		Controller.findAllProduct();
 		System.out.println("--------------------------------------------------------");
 		System.out.print("수정할 상품 번호: ");
 		long productId = Long.parseLong(Ojdbc.sc.nextLine());
@@ -77,7 +76,7 @@ public class Administrator extends Member {
 	}
 
 	public void deleteProduct() {
-		Management.findAllProduct();
+		Controller.findAllProduct();
 
 		System.out.println("--------------------------------------------------------");
 		System.out.print("삭제할 상품 번호: ");

@@ -1,6 +1,6 @@
 package main.domain;
 
-import main.Management;
+import main.Controller;
 import main.Ojdbc;
 
 import java.sql.ResultSet;
@@ -14,10 +14,10 @@ public class Customer extends Member{
 		Map<Product, Integer> map = new HashMap<>();
 
 		while (flag){
-			Management.findAllProduct();
+			Controller.findAllProduct();
 			System.out.print("몇 번 상품을 구매하시겠습니까?: ");
 			long productNo = Long.parseLong(Ojdbc.sc.nextLine());
-			Product product = Management.findProduct(productNo);
+			Product product = Controller.findProduct(productNo);
 			System.out.print("몇 개를 구매하시겠습니까?: ");
 			int quantity = Integer.parseInt(Ojdbc.sc.nextLine());
 
@@ -94,72 +94,45 @@ public class Customer extends Member{
 		}
 	}
 
-	public void checkHistory(Customer customer) {
-		String no;
-		String sql = "";
-		String date = "";
-		while(true){
-			System.out.println("-----------------------------------------");
-			System.out.println("1. 전체 주문 내역, 2. 월간 주문 내역 3. 나가기");
-			System.out.println("-----------------------------------------");
-			System.out.print("메뉴 선택 : ");
-			no = Ojdbc.sc.nextLine();
+	public void checkMonthlyOrderHistory(String date){
+		String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
+				"FROM order_history " +
+				"WHERE id = ? and TO_CHAR(order_date, 'YYYYMM') = ?";
+		try {
+			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+			Ojdbc.pstmt.setString(1, getId());
+			Ojdbc.pstmt.setString(2, date);
 
+			Ojdbc.rs = Ojdbc.pstmt.executeQuery();
+			Controller.showOrderHistory();
 
-			if("1".equals(no) || "2".equals(no)) {
-				System.out.println();
-				try {
-					if("1".equals(no)){
-						sql = "" +
-								"SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
-								"FROM order_history " +
-								"WHERE id = ?";
-						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
-						Ojdbc.pstmt.setString(1, customer.getId());
-					} else {
-						System.out.print("원하는 달의 주문 내역을 선택해주세요(ex: 202301) : ");
-						date = Ojdbc.sc.nextLine();
-						sql = "" +
-								"SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
-								"FROM order_history " +
-								"WHERE id = ? and TO_CHAR(order_date, 'YYYYMM') = ?";
-						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
-						Ojdbc.pstmt.setString(1, customer.getId());
-						Ojdbc.pstmt.setString(2, date);
-					}
-
-					Ojdbc.rs = Ojdbc.pstmt.executeQuery();
-					int seq = 0;
-					while (Ojdbc.rs.next()) {
-						System.out.printf(
-								"주문 번호: %4d | 상품명: %10s | 수량: %4d | 주문날짜: %10s | 취소여부: %3s 총 금액: %10d\n",
-								Ojdbc.rs.getLong(1), Ojdbc.rs.getString(2), Ojdbc.rs.getLong(3),
-								Ojdbc.rs.getDate(4), Ojdbc.rs.getString(5), Ojdbc.rs.getLong(6)
-						);
-						seq++;
-					}
-					if (seq == 0) {
-						System.out.println("해당 기간에 주문 내역이 없습니다.");
-					}
-					no = "";
-					Ojdbc.pstmt.close();
-					Ojdbc.rs.close();
-
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-
-			} else if("3".equals(no)){
-				break;
-			} else {
-				System.out.println("유효한 메뉴를 선택해주세요");
-			}
+			Ojdbc.pstmt.close();
+			Ojdbc.rs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
-
 	}
 
-	public void authorizeStudent(Customer customer) {
-		if("student".equals(customer.getMember_type())){
+	public void checkTotalOrderHistory() {
+		String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
+				"FROM order_history " +
+				"WHERE id = ?";
+		try {
+			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+			Ojdbc.pstmt.setString(1, getId());
+
+			Ojdbc.rs = Ojdbc.pstmt.executeQuery();
+			Controller.showOrderHistory();
+
+			Ojdbc.pstmt.close();
+			Ojdbc.rs.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public void authorizeStudent() {
+		if("student".equals(getMember_type())){
 			System.out.println("이미 학생 인증을 마치셨습니다");
 			return;
 		}
@@ -176,14 +149,14 @@ public class Customer extends Member{
 			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
 			if ("Y".equals(status)) {
 				Ojdbc.pstmt.setString(1, "student");
-				customer.setMember_type("student");
+				setMember_type("student");
 			} else if ("N".equals(status)) {
 				Ojdbc.pstmt.setString(1, "nonstudent");
-				customer.setMember_type("nonstudent");
+				setMember_type("nonstudent");
 			} else {
 				throw new Exception();
 			}
-			Ojdbc.pstmt.setString(2, customer.getId());
+			Ojdbc.pstmt.setString(2, getId());
 
 			Ojdbc.pstmt.executeUpdate();
 

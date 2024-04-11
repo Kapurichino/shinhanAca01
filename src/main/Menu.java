@@ -20,8 +20,8 @@ public class Menu {
 
             Ojdbc.conn = DriverManager.getConnection(
                     "jdbc:oracle:thin:@localhost:1521:xe",
-                    "testuser",
-                    "test1234"
+                    "sampleuser",
+                    "sample1234"
             );
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -42,7 +42,7 @@ public class Menu {
 
             switch (getNo()) {
                 case "1" -> {
-                    Member member = Management.signIn();
+                    Member member = Controller.signIn();
                     if (member instanceof Administrator admin) {
                         adminMain(admin);
                     } else if (member instanceof Customer customer) {
@@ -51,7 +51,7 @@ public class Menu {
                 }
                 case "2" -> {
                     try {
-                        Management.signUp();
+                        Controller.signUp();
                     } catch (Exception e) {
                         System.out.println("제대로 된 값을 입력해주세요");
                         show();
@@ -67,6 +67,28 @@ public class Menu {
                         e.printStackTrace();
                     }
                 }
+            }
+        }
+    }
+
+    public void orderHistoryMain(Customer customer){
+        while(true){
+            System.out.println("-----------------------------------------");
+            System.out.println("1. 전체 주문 내역, 2. 월간 주문 내역 3. 나가기");
+            System.out.println("-----------------------------------------");
+            System.out.print("메뉴 선택 : ");
+            String no = Ojdbc.sc.nextLine();
+
+            if("1".equals(no)) {
+                customer.checkTotalOrderHistory();
+            } else if ("2".equals(no)){
+                System.out.print("원하는 달의 주문 내역을 선택해주세요(ex: 202301) : ");
+                String date = Ojdbc.sc.nextLine();
+                customer.checkMonthlyOrderHistory(date);
+            }else if("3".equals(no)){
+                break;
+            } else {
+                System.out.println("유효한 메뉴를 선택해주세요");
             }
         }
     }
@@ -90,13 +112,13 @@ public class Menu {
                     customer.order();
                     break;
                 case "2":
-                    customer.checkHistory(customer);
+                    orderHistoryMain(customer);
                     break;
                 case "3":
-                    customer.authorizeStudent(customer);
+                    customer.authorizeStudent();
                     break;
                 case "4":
-                    Management.modifyMemberInfo(customer);
+                    Controller.modifyMemberInfo(customer);
                     break;
                 case "5":
                     System.out.println("로그아웃 되었습니다");

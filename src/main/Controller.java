@@ -8,7 +8,7 @@ import main.domain.Product;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Management {
+public class Controller {
 
     public static void modifyMemberInfo(Member member) {
         String no;
@@ -247,5 +247,20 @@ public class Management {
             e.printStackTrace();
         }
         return product;
+    }
+
+    public static void showOrderHistory() throws Exception{
+        int seq = 0;
+        while (Ojdbc.rs.next()) {
+            System.out.printf(
+                    "주문 번호: %4d | 상품명: %10s | 수량: %4d | 주문날짜: %10s | 취소여부: %3s 총 금액: %10d\n",
+                    Ojdbc.rs.getLong(1), Ojdbc.rs.getString(2), Ojdbc.rs.getLong(3),
+                    Ojdbc.rs.getDate(4), Ojdbc.rs.getString(5), Ojdbc.rs.getLong(6)
+            );
+            seq++;
+        }
+        if (seq == 0) {
+            System.out.println("해당 기간에 주문 내역이 없습니다.");
+        }
     }
 }
