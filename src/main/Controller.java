@@ -7,9 +7,8 @@ import main.domain.Product;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.SQLOutput;
 
-public class Management {
+public class Controller {
     public static void modifyMemberInfo(Member member) {
         String no;
         String id = member.getId();
@@ -66,12 +65,13 @@ public class Management {
                 member.setTel(tel);
                 System.out.println("정보가 정상적으로 변경되었습니다.");
                 Ojdbc.pstmt.close();
-            } catch (Exception e) {
+            } catch (SQLException e){
+                System.out.println("이미 존재하는 회원 아이디입니다.");
+            }catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
-
 
     public static void signUp() throws Exception{
         Member member = new Member();
@@ -109,13 +109,10 @@ public class Management {
             Ojdbc.pstmt.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("이미 존재하는 회원 아이디입니다.");
         }
     }
 
-    public static void signOut() {
-        Menu.getInstance().show();
-    }
 
     public static Member signIn() {
         Member member = null;
@@ -142,7 +139,7 @@ public class Management {
                             Ojdbc.rs.getString("name"),
                             Ojdbc.rs.getString("tel"),
                             Ojdbc.rs.getString("member_type")
-                            );
+                    );
 
                     System.out.printf("%-6s%-12s%-16s%-40s \n",
                             admin.getId(),
@@ -179,9 +176,8 @@ public class Management {
             Ojdbc.pstmt.close();
             Ojdbc.rs.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // TODO: handle exception
+        }catch (Exception e){
+            System.out.println("제대로 된 값을 입력해주세요");
         }
         return member;
     }
@@ -189,31 +185,93 @@ public class Management {
     public static void findAllProduct() {
         try {
             String sql = "" +
-                    "SELECT * FROM product ";
+                    "SELECT * FROM product ORDER BY product_id DESC ";
 
             Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
 
             ResultSet rs = Ojdbc.pstmt.executeQuery();
+            System.out.printf("%-6s %-10s %-8s %-8s %-8s\n"
+                    ,"상품 번호"
+                    ,"상품 이름"
+                    ,"상품 가격"
+                    ,"할인율"
+                    ,"할인적용가격");
             while (rs.next()) {
                 Product product = new Product(
                         rs.getLong("product_id"),
                         rs.getString("product_name"),
-                        rs.getLong("price"),
-                        rs.getLong("discount_rate")
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
                 );
-                System.out.printf("%-6d %-12s %-6d %-6d\n"
+
+                System.out.printf("%-9d %-10s %-10d %-10d %-8d\n"
                         ,product.getProduct_id()
                         ,product.getProduct_name()
                         ,product.getPrice()
                         ,product.getDiscount_rate()
+                        ,product.getPrice() * (100-product.getDiscount_rate()) / 100
                 );
+            }
+        } catch (SQLException e) {
+            System.out.println("정보를 불러올 수 없습니다.");
+        }
+    }
+
+    public static void findAllProduct(Customer customer) {
+        try {
+            String sql = "" +
+                    "SELECT * FROM product ORDER BY product_id DESC ";
+
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+
+            ResultSet rs = Ojdbc.pstmt.executeQuery();
+            if("student".equals(customer.getMember_type())){
+                System.out.printf("%-6s %-10s %-8s %-8s %-8s\n"
+                        ,"상품 번호"
+                        ,"상품 이름"
+                        ,"상품 가격"
+                        ,"할인율"
+                        ,"할인적용가격");
+            } else {
+                System.out.printf("%-6s %-10s %-8s\n"
+                        ,"상품 번호"
+                        ,"상품 이름"
+                        ,"상품 가격");
+            }
+
+            while (rs.next()) {
+                Product product = new Product(
+                        rs.getLong("product_id"),
+                        rs.getString("product_name"),
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
+                );
+
+                if("student".equals(customer.getMember_type())){
+                    System.out.printf("%-9d %-10s %-10d %-10d %-8d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                            ,product.getDiscount_rate()
+                            ,product.getPrice() * (100-product.getDiscount_rate()) / 100
+                    );
+                } else {
+                    System.out.printf("%-9d %-10s %-10d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                    );
+                }
+
+
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    public static void findProduct(Long product_id){
+    public static Product findProduct(Long product_id){
+        Product product = null;
         try {
             String sql = "" +
                     "SELECT * FROM product "+
@@ -223,22 +281,88 @@ public class Management {
             Ojdbc.pstmt.setLong(1,product_id);
             ResultSet rs = Ojdbc.pstmt.executeQuery();
             while (rs.next()) {
-                Product product = new Product(
+                product = new Product(
                         rs.getLong("product_id"),
                         rs.getString("product_name"),
-                        rs.getLong("price"),
-                        rs.getLong("discount_rate")
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
                 );
-                System.out.printf("%-6d %-12s %-6d %-6d\n"
+
+                System.out.printf("%-6d %-12s %-6d %-6d %-6d\n"
                         ,product.getProduct_id()
                         ,product.getProduct_name()
                         ,product.getPrice()
                         ,product.getDiscount_rate()
+                        ,product.getPrice() * (100-product.getDiscount_rate()) / 100
                 );
             }
             Ojdbc.pstmt.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return product;
+    }
+
+    public static Product findProduct(Long product_id, Customer customer){
+        Product product = null;
+        try {
+            String sql = "" +
+                    "SELECT * FROM product "+
+                    "WHERE product_id=? ";
+
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+            Ojdbc.pstmt.setLong(1,product_id);
+            ResultSet rs = Ojdbc.pstmt.executeQuery();
+            while (rs.next()) {
+                product = new Product(
+                        rs.getLong("product_id"),
+                        rs.getString("product_name"),
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
+                );
+
+                if("student".equals(customer.getMember_type())){
+                    System.out.printf("%-6d %-12s %-6d %-6d %-6d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                            ,product.getDiscount_rate()
+                            ,product.getPrice() * (100-product.getDiscount_rate()) / 100
+                    );
+                } else {
+                    System.out.printf("%-6d %-12s %-6d\n"
+                            ,product.getProduct_id()
+                            ,product.getProduct_name()
+                            ,product.getPrice()
+                    );
+                }
+
+
+            }
+            Ojdbc.pstmt.close();
+        }catch (SQLException e) {
+            System.out.println("상품 번호를 확인해주세요");
+        }catch (NumberFormatException e){
+            System.out.println("숫자만 입력해주세요");
+        }catch (Exception e){
+            System.out.println("제대로 된 값을 입력해주세요");
+        }
+        return product;
+    }
+
+    public static int showOrderHistory() throws Exception{
+        int seq = 0;
+        while (Ojdbc.rs.next()) {
+            System.out.printf(
+                    "주문 번호: %4d | 상품명: %10s | 수량: %4d | 주문날짜: %10s | 취소여부: %3s 총 금액: %10d\n",
+                    Ojdbc.rs.getLong(1), Ojdbc.rs.getString(2), Ojdbc.rs.getLong(3),
+                    Ojdbc.rs.getDate(4), Ojdbc.rs.getString(5), Ojdbc.rs.getLong(6)
+            );
+            seq++;
+        }
+        if (seq == 0) {
+            System.out.println("주문 내역이 없습니다.");
+        }
+        return seq;
     }
 }
