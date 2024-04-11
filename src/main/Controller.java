@@ -63,10 +63,10 @@ public class Controller {
                 member.setPwd(pwd);
                 member.setName(name);
                 member.setTel(tel);
-                System.out.println("정보가 정상적으로 변경되었습니다.");
+                System.out.println("정보가 정상적으로 변경되었습니다");
                 Ojdbc.pstmt.close();
             } catch (SQLException e){
-                System.out.println("이미 존재하는 회원 아이디입니다.");
+                System.out.println("이미 존재하는 회원 아이디입니다");
             }catch (Exception e) {
                 e.printStackTrace();
             }
@@ -105,11 +105,13 @@ public class Controller {
             }
 
             int rows = Ojdbc.pstmt.executeUpdate();
-            System.out.println("저장된 행 수 : "+rows);
+            if(rows>0){
+                System.out.println("회원가입에 성공했습니다");
+            }
             Ojdbc.pstmt.close();
 
         } catch (SQLException e) {
-            System.out.println("이미 존재하는 회원 아이디입니다.");
+            System.out.println("이미 존재하는 회원 아이디입니다");
         }
     }
 
@@ -140,10 +142,10 @@ public class Controller {
                             Ojdbc.rs.getString("tel"),
                             Ojdbc.rs.getString("member_type")
                     );
-
-                    System.out.printf("%-6s%-12s%-16s%-40s \n",
+                    System.out.println("\n사용자정보");
+                    System.out.printf("%-20s%-20s%-20s\n","id","이름","전화번호");
+                    System.out.printf("%-20s%-20s%-20s",
                             admin.getId(),
-                            admin.getPwd(),
                             admin.getName(),
                             admin.getTel());
                     Ojdbc.pstmt.close();
@@ -158,10 +160,10 @@ public class Controller {
                             Ojdbc.rs.getString("tel"),
                             Ojdbc.rs.getString("member_type")
                     );
-
-                    System.out.printf("%-6s%-12s%-16s%-40s \n",
+                    System.out.println("\n사용자정보");
+                    System.out.printf("%-20s%-20s%-20s\n","id","이름","전화번호");
+                    System.out.printf("%-20s%-20s%-20s",
                             customer.getId(),
-                            customer.getPwd(),
                             customer.getName(),
                             customer.getTel());
                     Ojdbc.pstmt.close();
@@ -170,7 +172,7 @@ public class Controller {
                 }
 
             } else {
-                System.out.println("올바른 사용자가 아닙니다.");
+                System.out.println("아이디와 비밀번호를 확인해주세요");
             }
 
             Ojdbc.pstmt.close();
@@ -213,7 +215,7 @@ public class Controller {
                 );
             }
         } catch (SQLException e) {
-            System.out.println("정보를 불러올 수 없습니다.");
+            System.out.println("정보를 불러올 수 없습니다");
         }
     }
 
@@ -361,8 +363,35 @@ public class Controller {
             seq++;
         }
         if (seq == 0) {
-            System.out.println("주문 내역이 없습니다.");
+            System.out.println("주문 내역이 없습니다");
         }
         return seq;
+    }
+
+    public static boolean productIsExist(long product_id){
+        Product product = null;
+        try {
+            String sql = "" +
+                    "SELECT * FROM product "+
+                    "WHERE product_id=? ";
+
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+            Ojdbc.pstmt.setLong(1,product_id);
+            ResultSet rs = Ojdbc.pstmt.executeQuery();
+            while (rs.next()) {
+                product = new Product(
+                        rs.getLong("product_id"),
+                        rs.getString("product_name"),
+                        rs.getLong("discount_rate"),
+                        rs.getLong("price")
+                );
+            }
+            Ojdbc.pstmt.close();
+        }catch (Exception e){
+        }
+        if(product == null){
+            return false;
+        }
+        return true;
     }
 }

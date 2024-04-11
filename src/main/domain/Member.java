@@ -14,10 +14,4 @@ public class Member {
 	private String tel;
 	private String member_type;
 
-	public void updateMember(String pwd, String name, String tel, String member_type){
-		this.pwd = pwd;
-		this.name = name;
-		this.tel = tel;
-		this.member_type = member_type;
-	}
 }
