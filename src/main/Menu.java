@@ -83,7 +83,12 @@ public class Menu {
             } else if ("2".equals(no)){
                 System.out.print("원하는 달의 주문 내역을 선택해주세요(ex: 202301) : ");
                 String date = Ojdbc.sc.nextLine();
-                customer.checkMonthlyOrderHistory(date);
+                String regexp = "\\d{6}";
+                if(date.matches(regexp)){
+                    customer.checkMonthlyOrderHistory(date);
+                }else{
+                    System.out.println("입력 형식이 맞지 않습니다");
+                }
             }else if("3".equals(no)){
                 break;
             } else {
@@ -95,7 +100,8 @@ public class Menu {
     public void cancelOrderMain(Customer customer){
         String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
                 "FROM order_history " +
-                "WHERE id = ? and cancel = 'N'";
+                "WHERE id = ? and cancel = 'N' " +
+                "ORDER BY order_id DESC ";
         try {
             Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
             Ojdbc.pstmt.setString(1, customer.getId());
@@ -112,7 +118,7 @@ public class Menu {
                 String order_id = Ojdbc.sc.nextLine();
 
                 sql = "UPDATE order_history SET cancel = 'Y'" +
-                        "WHERE id = ? and order_id = ?";
+                        "WHERE id = ? and order_id = ? and cancel = 'N' ";
 
                 Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
                 Ojdbc.pstmt.setString(1, customer.getId());
@@ -121,10 +127,10 @@ public class Menu {
                 int row =  Ojdbc.pstmt.executeUpdate();
 
                 if(row == 0){
-                    System.out.println("유효한 주문 번호를 선택해주세요.");
+                    System.out.println("유효한 주문 번호를 선택해주세요");
                 } else {
                     System.out.println();
-                    System.out.println("주문이 정상적으로 취소되었습니다.");
+                    System.out.println("주문이 정상적으로 취소되었습니다");
                 }
             }
 

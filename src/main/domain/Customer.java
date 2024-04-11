@@ -32,7 +32,7 @@ public class Customer extends Member{
 					map.put(product, quantity);
 				}
 
-				System.out.println("장바구니에 추가되었습니다.");
+				System.out.println("장바구니에 추가되었습니다");
 				System.out.println("--------------------");
 				System.out.println("장바구니");
 
@@ -48,13 +48,17 @@ public class Customer extends Member{
 						}
 					}
 				}catch (NullPointerException e){
-					System.out.println("해당 상품은 존재하지 않습니다.");
-					break;
+					System.out.println("해당 상품은 존재하지 않습니다");
 				}
 
 				System.out.println("--------------------");
 				System.out.print("다른 상품을 더 구매하시겠습니까??(Y/N): ");
 				String answer = Ojdbc.sc.nextLine();
+				while(!answer.equals("N")&&!answer.equals("Y")){
+					System.out.println("제대로 된 값을 입력해주세요");
+					System.out.print("다른 상품을 더 구매하시겠습니까??(Y/N): ");
+					answer = Ojdbc.sc.nextLine();
+				}
 				if("N".equals(answer)){
 					flag = false;
 				}
@@ -73,6 +77,8 @@ public class Customer extends Member{
 				nextVal = rs.getInt("NEXTVAL");
 			}
 		}catch (Exception e){}
+
+		int res = 0;
 
 		for (Map.Entry<Product, Integer> entry : map.entrySet()) {
 			Product product = entry.getKey();
@@ -97,10 +103,7 @@ public class Customer extends Member{
 				}
 				Ojdbc.pstmt.setString(7, product.getProduct_name());
 
-				int res = Ojdbc.pstmt.executeUpdate();
-				if(res>0){
-					System.out.print("상품을 정상적으로 구매하였습니다.");
-				}
+				res = Ojdbc.pstmt.executeUpdate();
 
 				Ojdbc.pstmt.close();
 				Ojdbc.rs.close();
@@ -108,12 +111,16 @@ public class Customer extends Member{
 				e.printStackTrace();
 			}
 		}
+		if(res>0){
+			System.out.print("상품을 정상적으로 구매하였습니다");
+		}
 	}
 
 	public void checkMonthlyOrderHistory(String date){
 		String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
 				"FROM order_history " +
-				"WHERE id = ? and TO_CHAR(order_date, 'YYYYMM') = ?";
+				"WHERE id = ? and TO_CHAR(order_date, 'YYYYMM') = ? "+
+				"ORDER BY order_id DESC ";;
 		try {
 			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
 			Ojdbc.pstmt.setString(1, getId());
@@ -132,7 +139,8 @@ public class Customer extends Member{
 	public void checkTotalOrderHistory() {
 		String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
 				"FROM order_history " +
-				"WHERE id = ?";
+				"WHERE id = ? "+
+				"ORDER BY order_id DESC ";
 		try {
 			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
 			Ojdbc.pstmt.setString(1, getId());
@@ -176,7 +184,7 @@ public class Customer extends Member{
 
 			Ojdbc.pstmt.executeUpdate();
 
-			System.out.println("학생 인증에 성공하였습니다.");
+			System.out.println("학생 인증에 성공하였습니다");
 			Ojdbc.pstmt.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
