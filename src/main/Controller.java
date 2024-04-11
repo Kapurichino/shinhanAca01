@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class Controller {
-
     public static void modifyMemberInfo(Member member) {
         String no;
         String id = member.getId();
@@ -249,7 +248,7 @@ public class Controller {
         return product;
     }
 
-    public static void showOrderHistory() throws Exception{
+    public static int showOrderHistory() throws Exception{
         int seq = 0;
         while (Ojdbc.rs.next()) {
             System.out.printf(
@@ -260,7 +259,8 @@ public class Controller {
             seq++;
         }
         if (seq == 0) {
-            System.out.println("해당 기간에 주문 내역이 없습니다.");
+            System.out.println("주문 내역이 없습니다.");
         }
+        return seq;
     }
 }

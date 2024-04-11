@@ -71,6 +71,8 @@ public class Menu {
         }
     }
 
+
+
     public void orderHistoryMain(Customer customer){
         while(true){
             System.out.println("-----------------------------------------");
@@ -93,16 +95,60 @@ public class Menu {
         }
     }
 
+    public void cancelOrderMain(Customer customer){
+        String sql = "SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
+                "FROM order_history " +
+                "WHERE id = ? and cancel = 'N'";
+        try {
+            Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+            Ojdbc.pstmt.setString(1, customer.getId());
+
+            Ojdbc.rs = Ojdbc.pstmt.executeQuery();
+            int orderCount = Controller.showOrderHistory();
+
+
+
+            Ojdbc.rs.close();
+
+            if(orderCount != 0){
+                System.out.print("취소하려는 주문을 선택해주세요 : ");
+                String order_id = Ojdbc.sc.nextLine();
+
+                sql = "UPDATE order_history SET cancel = 'Y'" +
+                        "WHERE id = ? and order_id = ?";
+
+                Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+                Ojdbc.pstmt.setString(1, customer.getId());
+                Ojdbc.pstmt.setString(2, order_id);
+
+                int row =  Ojdbc.pstmt.executeUpdate();
+
+                if(row == 0){
+                    System.out.println("유효한 주문 번호를 선택해주세요.");
+                } else {
+                    System.out.println();
+                    System.out.println("주문이 정상적으로 취소되었습니다.");
+                }
+            }
+
+            Ojdbc.pstmt.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public void customerMain(Customer customer) {
         boolean flag = true;
         while (flag){
             System.out.println();
             System.out.println("--------------------------------------------------------");
             System.out.println("1.상품구매");
-            System.out.println("2.내역조회");
-            System.out.println("3.학생 인증");
-            System.out.println("4.회원 정보 수정");
-            System.out.println("5.로그아웃");
+            System.out.println("2.주문취소");
+            System.out.println("3.내역조회");
+            System.out.println("4.학생 인증");
+            System.out.println("5.회원 정보 수정");
+            System.out.println("6.로그아웃");
             System.out.println("--------------------------------------------------------");
             System.out.print("선택: ");
 
@@ -112,15 +158,18 @@ public class Menu {
                     customer.order();
                     break;
                 case "2":
-                    orderHistoryMain(customer);
+                    cancelOrderMain(customer);
                     break;
                 case "3":
-                    customer.authorizeStudent();
+                    orderHistoryMain(customer);
                     break;
                 case "4":
-                    Controller.modifyMemberInfo(customer);
+                    customer.authorizeStudent();
                     break;
                 case "5":
+                    Controller.modifyMemberInfo(customer);
+                    break;
+                case "6":
                     System.out.println("로그아웃 되었습니다");
                     flag = false;
                     break;
