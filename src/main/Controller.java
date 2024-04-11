@@ -65,7 +65,9 @@ public class Controller {
                 member.setTel(tel);
                 System.out.println("정보가 정상적으로 변경되었습니다.");
                 Ojdbc.pstmt.close();
-            } catch (Exception e) {
+            } catch (SQLException e){
+                System.out.println("이미 존재하는 회원 아이디입니다.");
+            }catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -107,7 +109,7 @@ public class Controller {
             Ojdbc.pstmt.close();
 
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("이미 존재하는 회원 아이디입니다.");
         }
     }
 
@@ -174,9 +176,8 @@ public class Controller {
             Ojdbc.pstmt.close();
             Ojdbc.rs.close();
 
-        } catch (SQLException e) {
-            e.printStackTrace();
-            // TODO: handle exception
+        }catch (Exception e){
+            System.out.println("제대로 된 값을 입력해주세요");
         }
         return member;
     }
@@ -212,7 +213,7 @@ public class Controller {
                 );
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println("정보를 불러올 수 없습니다.");
         }
     }
 
@@ -339,8 +340,12 @@ public class Controller {
 
             }
             Ojdbc.pstmt.close();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        }catch (SQLException e) {
+            System.out.println("상품 번호를 확인해주세요");
+        }catch (NumberFormatException e){
+            System.out.println("숫자만 입력해주세요");
+        }catch (Exception e){
+            System.out.println("제대로 된 값을 입력해주세요");
         }
         return product;
     }

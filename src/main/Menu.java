@@ -59,9 +59,6 @@ public class Menu {
                 }
                 case "3" -> {
                     try {
-                        Ojdbc.rs.close();
-                        Ojdbc.pstmt.close();
-                        Ojdbc.conn.close();
                         System.exit(0);
                     }catch (Exception e){
                         e.printStackTrace();
@@ -133,8 +130,8 @@ public class Menu {
 
             Ojdbc.pstmt.close();
 
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception e){
+            System.out.println("숫자를 입력해주세요");
         }
     }
 

@@ -9,45 +9,58 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Customer extends Member{
-	public void order() {
+	public void order(){
 		boolean flag = true;
 		Map<Product, Integer> map = new HashMap<>();
+		try {
 
-		while (flag){
-			Controller.findAllProduct(this);
-			System.out.print("몇 번 상품을 구매하시겠습니까?: ");
-			long productNo = Long.parseLong(Ojdbc.sc.nextLine());
-			Product product = Controller.findProduct(productNo, this);
-			System.out.print("몇 개를 구매하시겠습니까?: ");
-			int quantity = Integer.parseInt(Ojdbc.sc.nextLine());
+			while (flag){
+				Controller.findAllProduct(this);
+				System.out.print("몇 번 상품을 구매하시겠습니까?: ");
+				try {
+				long productNo = Long.parseLong(Ojdbc.sc.nextLine());
+				Product product = Controller.findProduct(productNo, this);
+				if(product == null){
+					throw new NullPointerException();
+				}
+				System.out.print("몇 개를 구매하시겠습니까?: ");
+				int quantity = Integer.parseInt(Ojdbc.sc.nextLine());
 
-			if(map.containsKey(product)){
-				map.put(product, map.get(product)+quantity);
-			}else{
-				map.put(product, quantity);
-			}
-
-			System.out.println("장바구니에 추가되었습니다.");
-			System.out.println("--------------------");
-			System.out.println("장바구니");
-			for (Map.Entry<Product, Integer> entry : map.entrySet()) {
-				String productName = entry.getKey().getProduct_name();
-				Integer value = entry.getValue();
-				long price = entry.getKey().getPrice();
-				long discountRate = entry.getKey().getDiscount_rate();
-				if("student".equals(getMember_type())){
-					System.out.printf("상품명 : %-8s 수량 : %-4d 총가격 : %-8d\n",productName, value, price*(100-discountRate)/100*value);
+				if(map.containsKey(product)){
+					map.put(product, map.get(product)+quantity);
 				}else{
-					System.out.printf("상품명 : %-8s 수량 : %-4d 총가격 : %-8d\n",productName, value, price*value);
+					map.put(product, quantity);
+				}
+
+				System.out.println("장바구니에 추가되었습니다.");
+				System.out.println("--------------------");
+				System.out.println("장바구니");
+
+					for (Map.Entry<Product, Integer> entry : map.entrySet()) {
+						String productName = entry.getKey().getProduct_name();
+						Integer value = entry.getValue();
+						long price = entry.getKey().getPrice();
+						long discountRate = entry.getKey().getDiscount_rate();
+						if("student".equals(getMember_type())){
+							System.out.printf("상품명 : %-8s 수량 : %-4d 총가격 : %-8d\n",productName, value, price*(100-discountRate)/100*value);
+						}else{
+							System.out.printf("상품명 : %-8s 수량 : %-4d 총가격 : %-8d\n",productName, value, price*value);
+						}
+					}
+				}catch (NullPointerException e){
+					System.out.println("해당 상품은 존재하지 않습니다.");
+					break;
+				}
+
+				System.out.println("--------------------");
+				System.out.print("다른 상품을 더 구매하시겠습니까??(Y/N): ");
+				String answer = Ojdbc.sc.nextLine();
+				if("N".equals(answer)){
+					flag = false;
 				}
 			}
-			System.out.println("--------------------");
-			/* todo 장바구니 상품 취소 */
-			System.out.print("다른 상품을 더 구매하시겠습니까??(Y/N): ");
-			String answer = Ojdbc.sc.nextLine();
-			if("N".equals(answer)){
-				flag = false;
-			}
+		}catch (NumberFormatException e){
+			System.out.println("숫자를 입력해주세요");
 		}
 
 		int nextVal = -1;
@@ -84,10 +97,13 @@ public class Customer extends Member{
 				}
 				Ojdbc.pstmt.setString(7, product.getProduct_name());
 
+				int res = Ojdbc.pstmt.executeUpdate();
+				if(res>0){
+					System.out.print("상품을 정상적으로 구매하였습니다.");
+				}
 
-				int rows = Ojdbc.pstmt.executeUpdate();
-				System.out.println("저장된 행 수 : "+rows);
-
+				Ojdbc.pstmt.close();
+				Ojdbc.rs.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
