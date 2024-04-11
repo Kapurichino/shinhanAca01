@@ -10,6 +10,68 @@ import java.sql.SQLException;
 
 public class Management {
 
+    public static void modifyMemberInfo(Member member) {
+        String no;
+        String id = member.getId();
+        String pwd = member.getPwd();
+        String name = member.getName();
+        String tel = member.getTel();
+        while(true) {
+            System.out.println("------------------------------------------------------------------");
+            System.out.println("1. 아이디 수정 | 2. 패스워드 수정 | 3. 이름 수정 | 4. 전화번호 수정 | 5. 나가기");
+            System.out.println("------------------------------------------------------------------");
+            System.out.println("회원 정보 ID: " + member.getId() + " | 이름: " + member.getName() + " | 전화번호: " + member.getTel());
+            System.out.println();
+            System.out.print("메뉴 선택 : ");
+            no = Ojdbc.sc.nextLine();
+
+            if ("5".equals(no)) break;
+
+            try {
+                switch (no) {
+                    case "1":
+                        System.out.print("수정할 회원 아이디: ");
+                        id = Ojdbc.sc.nextLine();
+                        Ojdbc.sql = "UPDATE member SET id = ? WHERE id = ?";
+                        Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+                        Ojdbc.pstmt.setString(1, id);
+                        break;
+                    case "2":
+                        System.out.print("수정할 회원 패스워드: ");
+                        pwd = Ojdbc.sc.nextLine();
+                        Ojdbc.sql = "UPDATE member SET pwd = ? WHERE id = ?";
+                        Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+                        Ojdbc.pstmt.setString(1, pwd);
+                        break;
+                    case "3":
+                        System.out.print("수정할 회원 이름: ");
+                        name = Ojdbc.sc.nextLine();
+                        Ojdbc.sql = "UPDATE member SET name = ? WHERE id = ?";
+                        Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+                        Ojdbc.pstmt.setString(1, name);
+                        break;
+                    case "4":
+                        System.out.print("수정할 회원 전화번호: ");
+                        tel = Ojdbc.sc.nextLine();
+                        Ojdbc.sql = "UPDATE member SET tel = ? WHERE id = ?";
+                        Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+                        Ojdbc.pstmt.setString(1, tel);
+                        break;
+                }
+                Ojdbc.pstmt.setString(2, member.getId());
+                Ojdbc.pstmt.executeUpdate();
+                member.setId(id);
+                member.setPwd(pwd);
+                member.setName(name);
+                member.setTel(tel);
+                System.out.println("정보가 정상적으로 변경되었습니다.");
+                Ojdbc.pstmt.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void signUp() throws Exception{
         Member member = new Member();
         System.out.println();
