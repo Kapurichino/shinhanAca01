@@ -20,8 +20,8 @@ public class Menu {
 
             Ojdbc.conn = DriverManager.getConnection(
                     "jdbc:oracle:thin:@localhost:1521:xe",
-                    "sampleuser",
-                    "sample1234"
+                    "testuser",
+                    "test1234"
             );
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
@@ -32,7 +32,7 @@ public class Menu {
 
     }
 
-    public void show() {
+    public void mainMenu() {
         while(true){
             System.out.println("---------------------------------------");
             System.out.println("메인 메뉴: 1. 로그인 | 2. 회원가입 | 3.종료");
@@ -54,7 +54,7 @@ public class Menu {
                         Controller.signUp();
                     } catch (Exception e) {
                         System.out.println("제대로 된 값을 입력해주세요");
-                        show();
+                        mainMenu();
                     }
                 }
                 case "3" -> {

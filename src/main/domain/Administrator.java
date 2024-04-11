@@ -12,36 +12,81 @@ public class Administrator extends Member {
 	}
 
 	public void modifyProduct() {
-		Controller.findAllProduct();
-		System.out.println("--------------------------------------------------------");
-		System.out.print("수정할 상품 번호: ");
-		long productId = Long.parseLong(Ojdbc.sc.nextLine());
-		System.out.print("수정할 상품 이름: ");
-		String productName = Ojdbc.sc.nextLine();
-		System.out.print("수정할 상품 가격: ");
-		long productPrice = Long.parseLong(Ojdbc.sc.nextLine());
-		System.out.print("수정할 상품 할인율: ");
-		long productDiscountRate = Long.parseLong(Ojdbc.sc.nextLine());
-		try {
-			String sql = new StringBuilder()
-					.append("UPDATE product SET ")
-					.append("product_name =?, ")
-					.append("price =?, ")
-					.append("discount_rate =? ")
-					.append("WHERE product_id = ? ")
-					.toString();
-			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
-			Ojdbc.pstmt.setString(1,productName);
-			Ojdbc.pstmt.setLong(2, productPrice);
-			Ojdbc.pstmt.setLong(3, productDiscountRate);
-			Ojdbc.pstmt.setLong(4, productId);
+//		long productId = Long.parseLong(Ojdbc.sc.nextLine());
+//		System.out.print("수정할 상품 이름: ");
+//		String productName = Ojdbc.sc.nextLine();
+//		System.out.print("수정할 상품 가격: ");
+//		long productPrice = Long.parseLong(Ojdbc.sc.nextLine());
+//		System.out.print("수정할 상품 할인율: ");
+//		long productDiscountRate = Long.parseLong(Ojdbc.sc.nextLine());
+//		try {
+//			String sql = new StringBuilder()
+//					.append("UPDATE product SET ")
+//					.append("product_name =?, ")
+//					.append("price =?, ")
+//					.append("discount_rate =? ")
+//					.append("WHERE product_id = ? ")
+//					.toString();
+//			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+//			Ojdbc.pstmt.setString(1,productName);
+//			Ojdbc.pstmt.setLong(2, productPrice);
+//			Ojdbc.pstmt.setLong(3, productDiscountRate);
+//			Ojdbc.pstmt.setLong(4, productId);
+//
+//			Ojdbc.pstmt.executeUpdate();
+//
+//			System.out.println("정보가 정상적으로 변경되었습니다.");
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+		while(true) {
+			System.out.println("--------------------------------------------------------");
+			Controller.findAllProduct();
+			System.out.print("수정할 상품 번호: ");
+			long productId = Long.parseLong(Ojdbc.sc.nextLine());
+			Product product = Controller.findProduct(productId);
+			System.out.println("------------------------------------------------------------------");
+			System.out.println("1. 상품 이름 수정 | 2. 상품 가격 수정 | 3. 할인율 수정 | 4. 나가기");
+			System.out.println("------------------------------------------------------------------");
+			System.out.println();
+			System.out.print("메뉴 선택 : ");
+			String answer = Ojdbc.sc.nextLine();
 
-			Ojdbc.pstmt.executeUpdate();
+			if ("4".equals(answer)) break;
 
-			System.out.println("정보가 정상적으로 변경되었습니다.");
-
-		} catch (SQLException e) {
-			e.printStackTrace();
+			try {
+				switch (answer) {
+					case "1":
+						System.out.print("수정할 상품 이름: ");
+						String name = Ojdbc.sc.nextLine();
+						Ojdbc.sql = "UPDATE product SET product_name = ? WHERE product_id = ?";
+						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+						Ojdbc.pstmt.setString(1, name);
+						break;
+					case "2":
+						System.out.print("수정할 상품 가격: ");
+						long price = Long.parseLong(Ojdbc.sc.nextLine());
+						Ojdbc.sql = "UPDATE member SET price = ? WHERE product_id = ?";
+						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+						Ojdbc.pstmt.setLong(1, price);
+						break;
+					case "3":
+						System.out.print("수정할 할인율: ");
+						long discountRate = Long.parseLong(Ojdbc.sc.nextLine());
+						Ojdbc.sql = "UPDATE member SET discount_rate = ? WHERE product_id = ?";
+						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(Ojdbc.sql);
+						Ojdbc.pstmt.setLong(1, discountRate);
+						break;
+				}
+				Ojdbc.pstmt.setLong(2, product.getProduct_id());
+				Ojdbc.pstmt.executeUpdate();
+				System.out.println("정보가 정상적으로 변경되었습니다.");
+				Ojdbc.pstmt.close();
+				break;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

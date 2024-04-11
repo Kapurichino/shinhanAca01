@@ -203,9 +203,10 @@ public class Controller {
                         rs.getLong("discount_rate")
                 );
 
-                System.out.printf("%-6d %-10s %-8d %-8d %-8d\n"
+                System.out.printf("%-9d %-10s %-10d %-10d %-8d\n"
                         ,product.getProduct_id()
                         ,product.getProduct_name()
+                        ,product.getPrice()
                         ,product.getPrice()
                         ,product.getDiscount_rate()
                         ,product.getPrice() * (100-product.getDiscount_rate()) / 100
