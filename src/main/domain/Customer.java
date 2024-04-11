@@ -68,8 +68,8 @@ public class Customer extends Member{
 			Long discountRate = entry.getKey().getDiscount_rate();
 			try {
 				String sql = "" +
-						"INSERT INTO order_history (id, product_id, order_id, order_date, cancel, quantity, total_price) " +
-						"VALUES (?, ?, ?, sysdate, ?, ?, ?)";
+						"INSERT INTO order_history (id, product_id, order_id, order_date, cancel, quantity, total_price, product_name) " +
+						"VALUES (?, ?, ?, sysdate, ?, ?, ?, ?)";
 
 				Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
 				Ojdbc.pstmt.setString(1,getId());
@@ -82,6 +82,7 @@ public class Customer extends Member{
 				}else{
 					Ojdbc.pstmt.setLong(6, price*quantity);
 				}
+				Ojdbc.pstmt.setString(7, product.getProduct_name());
 
 
 				int rows = Ojdbc.pstmt.executeUpdate();
@@ -94,34 +95,67 @@ public class Customer extends Member{
 	}
 
 	public void checkHistory(Customer customer) {
-		try {
-			String sql = "" +
-					"SELECT o.order_id, p.product_name, o.quantity, o.order_date, o.cancel, o.total_price " +
-					"FROM order_history o JOIN product p ON o.product_id = p.product_id " +
-					"WHERE o.id=?";
+		String no;
+		String sql = "";
+		String date = "";
+		while(true){
+			System.out.println("-----------------------------------------");
+			System.out.println("1. 전체 주문 내역, 2. 월간 주문 내역 3. 나가기");
+			System.out.println("-----------------------------------------");
+			System.out.print("메뉴 선택 : ");
+			no = Ojdbc.sc.nextLine();
 
-			Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
-			Ojdbc.pstmt.setString(1,customer.getId());
 
-			Ojdbc.rs = Ojdbc.pstmt.executeQuery();
+			if("1".equals(no) || "2".equals(no)) {
+				System.out.println();
+				try {
+					if("1".equals(no)){
+						sql = "" +
+								"SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
+								"FROM order_history " +
+								"WHERE id = ?";
+						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+						Ojdbc.pstmt.setString(1, customer.getId());
+					} else {
+						System.out.print("원하는 달의 주문 내역을 선택해주세요(ex: 202301) : ");
+						date = Ojdbc.sc.nextLine();
+						sql = "" +
+								"SELECT order_id, product_name, quantity, order_date, cancel, total_price " +
+								"FROM order_history " +
+								"WHERE id = ? and TO_CHAR(order_date, 'YYYYMM') = ?";
+						Ojdbc.pstmt = Ojdbc.conn.prepareStatement(sql);
+						Ojdbc.pstmt.setString(1, customer.getId());
+						Ojdbc.pstmt.setString(2, date);
+					}
 
-			while(Ojdbc.rs.next()){
-				System.out.print(
-						"주문 번호: " + Ojdbc.rs.getLong(1) +
-								" | 상품명: " + Ojdbc.rs.getString(2) +
-								" | 수량: " + Ojdbc.rs.getLong(3) +
-								" | 주문날짜: " + Ojdbc.rs.getDate(4) +
-								" | 취소여부: " + Ojdbc.rs.getString(5) +
-								" | 총 금액: " + Ojdbc.rs.getLong(6)
-				);
+					Ojdbc.rs = Ojdbc.pstmt.executeQuery();
+					int seq = 0;
+					while (Ojdbc.rs.next()) {
+						System.out.printf(
+								"주문 번호: %4d | 상품명: %10s | 수량: %4d | 주문날짜: %10s | 취소여부: %3s 총 금액: %10d\n",
+								Ojdbc.rs.getLong(1), Ojdbc.rs.getString(2), Ojdbc.rs.getLong(3),
+								Ojdbc.rs.getDate(4), Ojdbc.rs.getString(5), Ojdbc.rs.getLong(6)
+						);
+						seq++;
+					}
+					if (seq == 0) {
+						System.out.println("해당 기간에 주문 내역이 없습니다.");
+					}
+					no = "";
+					Ojdbc.pstmt.close();
+					Ojdbc.rs.close();
+
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+
+			} else if("3".equals(no)){
+				break;
+			} else {
+				System.out.println("유효한 메뉴를 선택해주세요");
 			}
-
-			Ojdbc.pstmt.close();
-			Ojdbc.rs.close();
-
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
+
 	}
 
 	public void authorizeStudent(Customer customer) {
