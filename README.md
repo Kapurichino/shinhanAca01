@@ -1,3 +1,6 @@
+## 교육 할인 해드립니다
+Team: 방성원, 백승준
+
 ### User Story
 
 ```
@@ -75,8 +78,6 @@ xx스토어의
 <img width="665" alt="짝 프로그래밍" src="https://github.com/Kapurichino/shinhanAca01/assets/31788366/829fae8c-61b2-4ab5-8f60-57dd2da6d1e9">
 
 짝 프로그래밍을 통해 오류 수정
-
-## 데모
 
 ## 아쉬운 점
 
